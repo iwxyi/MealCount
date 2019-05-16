@@ -17,9 +17,9 @@ class ShowWindow : public QDialog
     Q_OBJECT
 
 struct Cls {
-    int start_week, end_week; // 第几周
+    int start_week, end_week; // 第几周单位
     int week;   // 周日~周六，0~6
-    int course; // 课程：第1~12节课
+    int start_course, end_course; // 课程范围：第1~12节课
     bool dual; // 双周
     bool single; // 单周
     int member; // 人数
@@ -43,7 +43,7 @@ signals:
 
 public slots:
     void slotWeekChanged(int x);
-    void slotDateChanged(int x);
+    void slotDayChanged(int x);
 
 private:
     QStringList times, numbs;
@@ -52,6 +52,8 @@ private:
     QTextEdit* numb_edit;
 
     QList<Cls> clss;
+    int current_week;
+    int current_day;
 };
 
 #endif // SHOWWINDOW_H

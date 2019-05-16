@@ -42,7 +42,7 @@ void ShowWindow::initView()
 
     // 链接信号槽
     connect(week_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWeekChanged(int)));
-    connect(time_list, SIGNAL(currentRowChanged(int)), this, SLOT(slotDateChanged(int)));
+    connect(time_list, SIGNAL(currentRowChanged(int)), this, SLOT(slotDayChanged(int)));
 
     // 开始统计分离的课程
     analyze(times, numbs, clss);
@@ -117,15 +117,43 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
         time = time.replace("|单周", "");
     }
 
-    // 判断第几周
+    // 判断格式、使用正则表达式捕获
     QRegExp re("周(.)第([\\d,]+)节\\{第(\\d+)-(\\d+)周\\}");
     if (!re.exactMatch(time))
     {
         qDebug() << "无法正则匹配时间：" << time;
         return cls;
     }
+    QStringList ress = re.capturedTexts();
+    qDebug() << "capturedTexts:" << ress;
 
+    // 判断第几周
+    QString week = re.capturedTexts().at(1);
+    if (week == "日")
+        cls.week = 0;
+    else if (week == "一")
+        cls.week = 1;
+    else if (week == "二")
+        cls.week = 2;
+    else if (week == "三")
+        cls.week = 3;
+    else if (week == "四")
+        cls.week = 4;
+    else if (week == "五")
+        cls.week = 5;
+    else if (week == "六")
+        cls.week = 6;
 
+    // 判断课程范围
+    QStringList courses = ress.at(2).split(",");
+    cls.start_course = courses.first().toInt();
+    cls.end_course = courses.last().toInt();
+
+    // 判断上课时间
+    cls.start_week = ress.at(3).toInt();
+    cls.end_week = ress.at(4).toInt();
+
+    return cls;
 }
 
 /**
@@ -141,7 +169,7 @@ void ShowWindow::slotWeekChanged(int x)
  * 一周的第几天被改变
  * @param x 周几
  */
-void ShowWindow::slotDateChanged(int x)
+void ShowWindow::slotDayChanged(int x)
 {
 
 }
