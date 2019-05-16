@@ -145,7 +145,10 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
     if (!re.exactMatch(time))
     {
         qDebug() << "无法正则匹配时间：" << time;
-        return cls;
+        // 特判：周二第3-4节{17周}
+        re.setPattern("周(.)第?([\\d,-]+)节\\{第?(\\d+)周\\}");
+        if (!re.exactMatch(time))
+            return cls;
     }
     QStringList ress = re.capturedTexts();
 //    qDebug() << "capturedTexts:" << ress;
@@ -174,7 +177,10 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
 
     // 判断上课时间
     cls.start_week = ress.at(3).toInt();
-    cls.end_week = ress.at(4).toInt();
+    if (ress.size() > 4)
+        cls.end_week = ress.at(4).toInt();
+    else
+        cls.end_week = cls.start_week;
 
 //    qDebug() << cls.toString();
     return cls;
