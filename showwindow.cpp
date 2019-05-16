@@ -130,19 +130,19 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
     // 判断第几周
     QString week = re.capturedTexts().at(1);
     if (week == "日")
-        cls.week = 0;
+        cls.day = 0;
     else if (week == "一")
-        cls.week = 1;
+        cls.day = 1;
     else if (week == "二")
-        cls.week = 2;
+        cls.day = 2;
     else if (week == "三")
-        cls.week = 3;
+        cls.day = 3;
     else if (week == "四")
-        cls.week = 4;
+        cls.day = 4;
     else if (week == "五")
-        cls.week = 5;
+        cls.day = 5;
     else if (week == "六")
-        cls.week = 6;
+        cls.day = 6;
 
     // 判断课程范围
     QStringList courses = ress.at(2).split(",");
@@ -157,12 +157,41 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
 }
 
 /**
+ * 刷新显示的时间
+ */
+void ShowWindow::refreshInfomation()
+{
+    int morning4 = 0;
+    int morning5 = 0;
+    int afternoon9 = 0;
+    int night11 = 0;
+    int night12 = 0;
+
+    // 遍历每一个课程
+    for (int i = 0; i < clss.size(); i++)
+    {
+        Cls cls = clss.at(i);
+        if (cls.start_course < current_week || cls.end_course > current_week)
+            continue;
+    }
+
+    numb_edit->clear();
+    numb_edit->append("时间统计：\n");
+    numb_edit->append("上午第 4节：" + QString::number(morning4) + "\n");
+    numb_edit->append("上午第 5节：" + QString::number(morning4) + "\n");
+    numb_edit->append("下午第 9节：" + QString::number(morning4) + "\n");
+    numb_edit->append("晚上第11节：" + QString::number(morning4) + "\n");
+    numb_edit->append("晚上第12节：" + QString::number(morning4));
+}
+
+/**
  * 学期的第几周被改变
  * @param x 第几周
  */
 void ShowWindow::slotWeekChanged(int x)
 {
-
+    current_week = x;
+    refreshInfomation();
 }
 
 /**
@@ -171,5 +200,6 @@ void ShowWindow::slotWeekChanged(int x)
  */
 void ShowWindow::slotDayChanged(int x)
 {
-
+    current_day = x;
+    refreshInfomation();
 }

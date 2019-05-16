@@ -17,12 +17,12 @@ class ShowWindow : public QDialog
     Q_OBJECT
 
 struct Cls {
-    int start_week, end_week; // 第几周单位
-    int week;   // 周日~周六，0~6
-    int start_course, end_course; // 课程范围：第1~12节课
-    bool dual; // 双周
-    bool single; // 单周
-    int member; // 人数
+    int start_week, end_week;      // 第几周单位
+    int day;                       // 周日~周六，0~6
+    int start_course, end_course;  // 课程范围：第1~12节课
+    bool dual;                     // 双周
+    bool single;                   // 单周
+    int member;                    // 人数
 
     Cls()
     {
@@ -38,6 +38,7 @@ private:
     void analyze(QStringList times, QStringList numbs, QList<Cls> &clss);
     QList<Cls> clssFromString(QString time, QString numb);
     Cls clsFromString(QString time, QString numb);
+    void refreshInfomation();
 
 signals:
 
