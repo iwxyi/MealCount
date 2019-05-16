@@ -171,12 +171,30 @@ void ShowWindow::refreshInfomation()
     for (int i = 0; i < clss.size(); i++)
     {
         Cls cls = clss.at(i);
+        // 判断周的范围
         if (cls.start_course < current_week || cls.end_course > current_week)
+            continue;
+
+        // 判断单双周
+        if (cls.dual && current_week & 1)
+            continue;
+        if (cls.single && !(current_week & 1))
+            continue;
+
+        // 判断周几
+        if (cls.day != current_day)
             continue;
     }
 
     numb_edit->clear();
-    numb_edit->append("时间统计：\n");
+    QString xingqi = "日";
+    if (current_day == 1) xingqi = "一";
+    else if (current_day == 2) xingqi = "二";
+    else if (current_day == 3) xingqi = "三";
+    else if (current_day == 4) xingqi = "四";
+    else if (current_day == 5) xingqi = "五";
+    else if (current_day == 6) xingqi = "六";
+    numb_edit->append("第"+QString::number(current_week)+"周 星期"+xingqi+"：\n");
     numb_edit->append("上午第 4节：" + QString::number(morning4) + "\n");
     numb_edit->append("上午第 5节：" + QString::number(morning4) + "\n");
     numb_edit->append("下午第 9节：" + QString::number(morning4) + "\n");
