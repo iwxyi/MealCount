@@ -9,6 +9,7 @@
 #include <QTextEdit>
 #include <QComboBox>
 #include <QList>
+#include <QRegExp>
 
 class ShowWindow : public QDialog
 {
@@ -28,11 +29,14 @@ public:
 private:
     void initView();
     void analyze(QStringList times, QStringList numbs, QList<Cls> &clss);
+    QList<Cls> clssFromString(QString time, QString numb);
+    Cls clsFromString(QString time, QString numb);
 
 signals:
 
 public slots:
     void slotWeekChanged(int x);
+    void slotDatChanged(int x);
 
 private:
     QStringList times, numbs;

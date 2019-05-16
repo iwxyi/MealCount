@@ -32,6 +32,8 @@ void ShowWindow::initView()
 
     // 开始统计分离的课程
     analyze(times, numbs, clss);
+
+    // 添加每星期
 }
 
 /**
@@ -42,10 +44,65 @@ void ShowWindow::initView()
  */
 void ShowWindow::analyze(QStringList times, QStringList numbs, QList<Cls> &clss)
 {
+    clss.clear();
+    for (int i = 0; i < times.size(); i++)
+    {
+        QList<Cls> temps = clssFromString(times.at(i), numbs.at(i));
+        if (temps.size() > 0)
+        {
+            for (int j = 0; j < temps.size(); j++)
+            {
+                clss.append(temps.at(j));
+            }
+        }
+    }
+}
+
+/**
+ * 针对某一行，添加一个课程对象数组（因为每个课程可能有多个时间段）
+ * @param time 时间字符串
+ * @param numb 人数
+ * @return     课程对象数组
+ */
+QList<ShowWindow::Cls> ShowWindow::clssFromString(QString time, QString numb)
+{
+    QList<Cls> clss;
+    //if (time.indexOf(";") > -1) // 多个时间段
+    //{
+    QStringList times = time.split(";");
+    for (int i = 0; i < times.size(); i++)
+    {
+        clss.append(clsFromString(times.at(i), numb));
+    }
+    //}
+    //else ;
+}
+
+/**
+ * 添加一个具体的课程对象
+ * @param time 唯一时间
+ * @param numb 唯一人数
+ * @return     课程对象
+ */
+ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
+{
 
 }
 
+/**
+ * 学期的第几周被改变
+ * @param x 第几周
+ */
 void ShowWindow::slotWeekChanged(int x)
+{
+
+}
+
+/**
+ * 一周的第几天被改变
+ * @param x 周几
+ */
+void ShowWindow::slotDatChanged(int x)
 {
 
 }
