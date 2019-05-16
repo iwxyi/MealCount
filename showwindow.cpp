@@ -5,6 +5,9 @@ ShowWindow::ShowWindow(QWidget *parent, QString c1, QString c2) : QDialog(parent
     times = c1.split("\n");
     numbs = c2.split("\n");
 
+    current_week = 1;
+    current_day = 1;
+
     initView();
 }
 
@@ -106,26 +109,26 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
     time = time.replace("星期", "周");
 
     // 判断单双周
-    if (time.indexOf("|双周"))
+    if (time.indexOf("|双周") > -1)
     {
         cls.dual = true;
         time = time.replace("|双周", "");
     }
-    if (time.indexOf("|单周"))
+    if (time.indexOf("|单周") > 1)
     {
         cls.dual = true;
         time = time.replace("|单周", "");
     }
 
     // 判断格式、使用正则表达式捕获
-    QRegExp re("周(.)第([\\d,]+)节\\{第(\\d+)-(\\d+)周\\}");
+    QRegExp re("周(.)第?([\\d,-]+)节\\{第?(\\d+)-(\\d+)周\\}");
     if (!re.exactMatch(time))
     {
         qDebug() << "无法正则匹配时间：" << time;
         return cls;
     }
     QStringList ress = re.capturedTexts();
-    qDebug() << "capturedTexts:" << ress;
+//    qDebug() << "capturedTexts:" << ress;
 
     // 判断第几周
     QString week = re.capturedTexts().at(1);
@@ -144,8 +147,8 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
     else if (week == "六")
         cls.day = 6;
 
-    // 判断课程范围
-    QStringList courses = ress.at(2).split(",");
+    // 判断课程范围，可能是 1,2  也可能是 3-5
+    QStringList courses = ress.at(2).split(QRegExp("[,-]"));
     cls.start_course = courses.first().toInt();
     cls.end_course = courses.last().toInt();
 
@@ -153,6 +156,7 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
     cls.start_week = ress.at(3).toInt();
     cls.end_week = ress.at(4).toInt();
 
+//    qDebug() << cls.toString();
     return cls;
 }
 
@@ -166,24 +170,42 @@ void ShowWindow::refreshInfomation()
     int afternoon9 = 0;
     int night11 = 0;
     int night12 = 0;
-
+//qDebug() << "clss.size = " << clss.size();
     // 遍历每一个课程
     for (int i = 0; i < clss.size(); i++)
     {
         Cls cls = clss.at(i);
+        qDebug() << "cls:" << cls.toString();
+//qDebug() << "0";
         // 判断周的范围
-        if (cls.start_course < current_week || cls.end_course > current_week)
+        if (cls.start_week > current_week || cls.end_week < current_week)
             continue;
-
+//qDebug() << "1";
         // 判断单双周
         if (cls.dual && current_week & 1)
             continue;
         if (cls.single && !(current_week & 1))
             continue;
-
+//qDebug() << "2";
         // 判断周几
         if (cls.day != current_day)
             continue;
+//qDebug() << "3";
+        // 判断课程时间：上午4
+        if (cls.end_course == 4)
+            morning4 += cls.member;
+        // 判断课程时间：上午5
+        if (cls.end_course == 5)
+            morning5 += cls.member;
+        // 判断课程时间：下午9
+        if (cls.end_course == 9)
+            afternoon9 += cls.member;
+        // 判断课程时间：晚上11
+        if (cls.end_course == 11)
+            night11 += cls.member;
+        // 判断课程时间：晚上12
+        if (cls.end_course == 12)
+            night12 += cls.member;
     }
 
     numb_edit->clear();
@@ -195,11 +217,11 @@ void ShowWindow::refreshInfomation()
     else if (current_day == 5) xingqi = "五";
     else if (current_day == 6) xingqi = "六";
     numb_edit->append("第"+QString::number(current_week)+"周 星期"+xingqi+"：\n");
-    numb_edit->append("上午第 4节：" + QString::number(morning4) + "\n");
-    numb_edit->append("上午第 5节：" + QString::number(morning4) + "\n");
-    numb_edit->append("下午第 9节：" + QString::number(morning4) + "\n");
-    numb_edit->append("晚上第11节：" + QString::number(morning4) + "\n");
-    numb_edit->append("晚上第12节：" + QString::number(morning4));
+    numb_edit->append("上午第 4节：" + QString::number(morning4) + " 人\n");
+    numb_edit->append("上午第 5节：" + QString::number(morning5) + " 人\n");
+    numb_edit->append("下午第 9节：" + QString::number(afternoon9) + " 人\n");
+    numb_edit->append("晚上第11节：" + QString::number(night11) + " 人\n");
+    numb_edit->append("晚上第12节：" + QString::number(night12) + " 人");
 }
 
 /**
@@ -208,7 +230,7 @@ void ShowWindow::refreshInfomation()
  */
 void ShowWindow::slotWeekChanged(int x)
 {
-    current_week = x;
+    current_week = x+1;
     refreshInfomation();
 }
 

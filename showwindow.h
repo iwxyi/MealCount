@@ -27,6 +27,14 @@ struct Cls {
     Cls()
     {
         dual = single = false;
+        start_week = end_week = 0; // 判断失败设置为0
+    }
+
+    QString toString()
+    {
+        return QString("第 %1 ~ %2 周，周 %3 ，第 %4 ~ %5 节，%6 人 %7 %8").arg(start_week)
+                .arg(end_week).arg(day).arg(start_course).arg(end_course).arg(member)
+                .arg(dual?"双周":"").arg(single?"单周":"");
     }
 };
 
