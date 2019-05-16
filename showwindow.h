@@ -10,6 +10,7 @@
 #include <QComboBox>
 #include <QList>
 #include <QRegExp>
+#include <QDebug>
 
 class ShowWindow : public QDialog
 {
@@ -20,7 +21,13 @@ struct Cls {
     int week;   // 周日~周六，0~6
     int course; // 课程：第1~12节课
     bool dual; // 双周
+    bool single; // 单周
     int member; // 人数
+
+    Cls()
+    {
+        dual = single = false;
+    }
 };
 
 public:
@@ -36,7 +43,7 @@ signals:
 
 public slots:
     void slotWeekChanged(int x);
-    void slotDatChanged(int x);
+    void slotDateChanged(int x);
 
 private:
     QStringList times, numbs;

@@ -4,10 +4,14 @@ ShowWindow::ShowWindow(QWidget *parent, QString c1, QString c2) : QDialog(parent
 {
     times = c1.split("\n");
     numbs = c2.split("\n");
+
+    initView();
 }
 
 void ShowWindow::initView()
 {
+    this->setMinimumSize(100, 200);
+
     QHBoxLayout * main_layout = new QHBoxLayout;
     QVBoxLayout* vlayout = new QVBoxLayout;
     week_combo = new QComboBox(this);
@@ -27,13 +31,21 @@ void ShowWindow::initView()
     }
     week_combo->addItems(sl);
 
+    // 添加每星期
+    time_list->addItem("周日");
+    time_list->addItem("周一");
+    time_list->addItem("周二");
+    time_list->addItem("周三");
+    time_list->addItem("周四");
+    time_list->addItem("周五");
+    time_list->addItem("周六");
+
     // 链接信号槽
     connect(week_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWeekChanged(int)));
+    connect(time_list, SIGNAL(currentRowChanged(int)), this, SLOT(slotDateChanged(int)));
 
     // 开始统计分离的课程
     analyze(times, numbs, clss);
-
-    // 添加每星期
 }
 
 /**
@@ -76,6 +88,7 @@ QList<ShowWindow::Cls> ShowWindow::clssFromString(QString time, QString numb)
     }
     //}
     //else ;
+    return clss;
 }
 
 /**
@@ -86,6 +99,32 @@ QList<ShowWindow::Cls> ShowWindow::clssFromString(QString time, QString numb)
  */
 ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
 {
+    Cls cls;
+    cls.member = numb.toInt();
+
+    // 去掉“星期”
+    time = time.replace("星期", "周");
+
+    // 判断单双周
+    if (time.indexOf("|双周"))
+    {
+        cls.dual = true;
+        time = time.replace("|双周", "");
+    }
+    if (time.indexOf("|单周"))
+    {
+        cls.dual = true;
+        time = time.replace("|单周", "");
+    }
+
+    // 判断第几周
+    QRegExp re("周(.)第([\\d,]+)节\\{第(\\d+)-(\\d+)周\\}");
+    if (!re.exactMatch(time))
+    {
+        qDebug() << "无法正则匹配时间：" << time;
+        return cls;
+    }
+
 
 }
 
@@ -102,7 +141,7 @@ void ShowWindow::slotWeekChanged(int x)
  * 一周的第几天被改变
  * @param x 周几
  */
-void ShowWindow::slotDatChanged(int x)
+void ShowWindow::slotDateChanged(int x)
 {
 
 }

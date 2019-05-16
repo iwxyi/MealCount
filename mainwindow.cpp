@@ -32,5 +32,6 @@ void MainWindow::on_pushButton_clicked()
         return ;
     }
 
-
+    ShowWindow* showWindow = new ShowWindow(this, time_str, numb_str);
+    showWindow->show();
 }
