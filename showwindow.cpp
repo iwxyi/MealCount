@@ -114,10 +114,30 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
         cls.dual = true;
         time = time.replace("|双周", "");
     }
+    if (time.indexOf("(双)") > -1)
+    {
+        cls.dual = true;
+        time = time.replace("(双)", "");
+    }
+    if (time.indexOf("（双）") > -1)
+    {
+        cls.dual = true;
+        time = time.replace("（双）", "");
+    }
     if (time.indexOf("|单周") > 1)
     {
         cls.dual = true;
         time = time.replace("|单周", "");
+    }
+    if (time.indexOf("（单）") > 1)
+    {
+        cls.dual = true;
+        time = time.replace("（单周）", "");
+    }
+    if (time.indexOf("(单)") > 1)
+    {
+        cls.dual = true;
+        time = time.replace("(单)", "");
     }
 
     // 判断格式、使用正则表达式捕获
@@ -175,7 +195,7 @@ void ShowWindow::refreshInfomation()
     for (int i = 0; i < clss.size(); i++)
     {
         Cls cls = clss.at(i);
-        qDebug() << "cls:" << cls.toString();
+//        qDebug() << "cls:" << cls.toString();
 //qDebug() << "0";
         // 判断周的范围
         if (cls.start_week > current_week || cls.end_week < current_week)
