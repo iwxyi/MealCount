@@ -42,10 +42,10 @@ struct Cls {
     }
 };
 
-struct DayNum {
+struct DayNums {
     int m4, m5, a9, n11, n12;
 
-    DayNum()
+    DayNums()
     {
         m4 = m5 = a9 = n11 = n12 = 0;
     }
@@ -62,7 +62,7 @@ public:
 protected:
     QString weekDayTrans(int x);
     int weekDayTrans(QString);
-    DayNum getDayInfo(int week, int day);
+    DayNums getDayNums(int week, int day);
 
 private:
     void initView();
@@ -86,6 +86,7 @@ private:
     QPushButton* copy_btn;
 
     QList<Cls> clss;
+    bool Monday_first;
     int current_week;
     int current_day;
 };

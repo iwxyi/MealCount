@@ -5,56 +5,51 @@ ShowWindow::ShowWindow(QWidget *parent, QString c1, QString c2) : QDialog(parent
     times = c1.split("\n");
     numbs = c2.split("\n");
 
+    Monday_first = true;
     current_week = 1;
     current_day = 1;
 
     initView();
 }
 
-/**
- * 星期几整型转换为字符串型
- * @param x 星期几
- * @return  字符串的周几
- */
-QString ShowWindow::weekDayTrans(int x)
+void ShowWindow::initView()
 {
-    switch (x)
-    {
-    case 0 :
-        return "日";
-    case 1 :
-        return "一";
-    case 2 :
-        return "二";
-    case 3 :
-        return "三";
-    case 4 :
-        return "四";
-    case 5 :
-        return "五";
-    case 6 :
-        return "六";
-    }
-    return "";
-}
+    this->setMinimumSize(100, 200);
 
-int ShowWindow::weekDayTrans(QString s)
-{
-    if (s == "日")
-        return 0;
-    else if (s == "一")
-        return 1;
-    else if (s == "二")
-        return 2;
-    else if (s == "三")
-        return 3;
-    else if (s == "四")
-        return 4;
-    else if (s == "五")
-        return 5;
-    else if (s == "六")
-        return 6;
-    return -1;
+    QHBoxLayout * main_layout = new QHBoxLayout;
+    QVBoxLayout* vlayout = new QVBoxLayout;
+    week_combo = new QComboBox(this);
+    time_list = new QListWidget(this);
+    numb_edit = new QTextEdit(this);
+    copy_btn = new QPushButton("复制所有", this);
+    vlayout->addWidget(week_combo);
+    vlayout->addWidget(time_list);
+    main_layout->addLayout(vlayout);
+    main_layout->addWidget(numb_edit);
+    main_layout->addWidget(copy_btn);
+    this->setLayout(main_layout);
+
+    // 添加周数
+    QStringList sl;
+    for (int i = 1; i < 30; i++)
+    {
+        sl << QString::number(i);
+    }
+    week_combo->addItems(sl);
+
+    // 添加每星期
+    for (int i = (Monday_first ? 1 : 0); i < 7+(Monday_first ? 1 : 0); i++)
+    {
+        time_list->addItem("周"+weekDayTrans(i));
+    }
+
+    // 链接信号槽
+    connect(week_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWeekChanged(int)));
+    connect(time_list, SIGNAL(currentRowChanged(int)), this, SLOT(slotDayChanged(int)));
+    connect(copy_btn, SIGNAL(clicked()), this, SLOT(slotCopyAll()));
+
+    // 开始统计分离的课程
+    analyze(times, numbs, clss);
 }
 
 /**
@@ -63,9 +58,9 @@ int ShowWindow::weekDayTrans(QString s)
  * @param day  周几
  * @return     一天餐点的人数
  */
-ShowWindow::DayNum ShowWindow::getDayInfo(int week, int day)
+ShowWindow::DayNums ShowWindow::getDayNums(int week, int day)
 {
-    DayNum dn;
+    DayNums dn;
 
     // 遍历每一个课程
     for (int i = 0; i < clss.size(); i++)
@@ -106,44 +101,54 @@ ShowWindow::DayNum ShowWindow::getDayInfo(int week, int day)
     return dn;
 }
 
-void ShowWindow::initView()
+/**
+ * 星期几整型转换为字符串型
+ * @param x 星期几
+ * @return  字符串的周几
+ */
+QString ShowWindow::weekDayTrans(int x)
 {
-    this->setMinimumSize(100, 200);
-
-    QHBoxLayout * main_layout = new QHBoxLayout;
-    QVBoxLayout* vlayout = new QVBoxLayout;
-    week_combo = new QComboBox(this);
-    time_list = new QListWidget(this);
-    numb_edit = new QTextEdit(this);
-    copy_btn = new QPushButton("复制所有", this);
-    vlayout->addWidget(week_combo);
-    vlayout->addWidget(time_list);
-    main_layout->addLayout(vlayout);
-    main_layout->addWidget(numb_edit);
-    main_layout->addWidget(copy_btn);
-    this->setLayout(main_layout);
-
-    // 添加周数
-    QStringList sl;
-    for (int i = 1; i < 30; i++)
+    switch (x)
     {
-        sl << QString::number(i);
+    case 0 :
+        return "日";
+    case 1 :
+        return "一";
+    case 2 :
+        return "二";
+    case 3 :
+        return "三";
+    case 4 :
+        return "四";
+    case 5 :
+        return "五";
+    case 6 :
+        return "六";
+    case 7 :
+        return "日";
     }
-    week_combo->addItems(sl);
+    return "";
+}
 
-    // 添加每星期
-    for (int i = 0; i < 7; i++)
-    {
-        time_list->addItem("周"+weekDayTrans(i));
-    }
-
-    // 链接信号槽
-    connect(week_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWeekChanged(int)));
-    connect(time_list, SIGNAL(currentRowChanged(int)), this, SLOT(slotDayChanged(int)));
-    connect(copy_btn, SIGNAL(clicked()), this, SLOT(slotCopyAll()));
-
-    // 开始统计分离的课程
-    analyze(times, numbs, clss);
+int ShowWindow::weekDayTrans(QString s)
+{
+    if (!Monday_first && s == "日")
+        return 0;
+    else if (s == "一")
+        return 1;
+    else if (s == "二")
+        return 2;
+    else if (s == "三")
+        return 3;
+    else if (s == "四")
+        return 4;
+    else if (s == "五")
+        return 5;
+    else if (s == "六")
+        return 6;
+    else if (s == "日")
+        return 7;
+    return -1;
 }
 
 /**
@@ -275,7 +280,7 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
  */
 void ShowWindow::refreshInfomation()
 {
-    DayNum dn = getDayInfo(current_week, current_day);
+    DayNums dn = getDayNums(current_week, current_day);
 
     numb_edit->clear();
     QString xingqi = weekDayTrans(current_day);
@@ -303,7 +308,7 @@ void ShowWindow::slotWeekChanged(int x)
  */
 void ShowWindow::slotDayChanged(int x)
 {
-    current_day = x;
+    current_day = x + (Monday_first ? 1 : 0);
     refreshInfomation();
 }
 
@@ -315,10 +320,17 @@ void ShowWindow::slotCopyAll()
     QString ex_str = "周数\t星期\t上午4\t上午5\t下午9\t晚上11\t晚上12\n";
     for (int week = 1; week < 30; week++)
     {
-        for (int day = 0; day < 7; day++)
+        int none_day = 0;
+        for (int day = (Monday_first ? 1 : 0); day < 7 + (Monday_first ? 1 : 0); day++)
         {
-
+            DayNums dn = getDayNums(week, day);
+            if (!dn.m4 && !dn.m5 && !dn.a9 && !dn.n11 && !dn.n12)
+                none_day++;
+            ex_str += "第" + QString::number(week) + "周\t星期" + weekDayTrans(day) + "\t" + dn.toString() + "\n";
         }
+        // 判断有没有超过期末（直到一周完全没课）
+        if (week > 18 && none_day == 7)
+            break;
     }
     QClipboard *board = QApplication::clipboard();
     board->setText(ex_str);
