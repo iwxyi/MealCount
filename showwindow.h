@@ -42,8 +42,16 @@ struct Cls {
     }
 };
 
+struct DayNum {
+    int m4, m5, a9, n11, n12;
+};
+
 public:
     ShowWindow(QWidget* parent, QString c1, QString c2);
+
+protected:
+    QString weekDayTrans(int x);
+    int weekDayTrans(QString);
 
 private:
     void initView();

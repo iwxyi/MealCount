@@ -11,6 +11,52 @@ ShowWindow::ShowWindow(QWidget *parent, QString c1, QString c2) : QDialog(parent
     initView();
 }
 
+/**
+ * 星期几整型转换为字符串型
+ * @param x 星期几
+ * @return  字符串的周几
+ */
+QString ShowWindow::weekDayTrans(int x)
+{
+    switch (x)
+    {
+    case 0 :
+        return "日";
+    case 1 :
+        return "一";
+    case 2 :
+        return "二";
+    case 3 :
+        return "三";
+    case 4 :
+        return "四";
+    case 5 :
+        return "五";
+    case 6 :
+        return "六";
+    }
+    return "";
+}
+
+int ShowWindow::weekDayTrans(QString s)
+{
+    if (s == "日")
+        return 0;
+    else if (s == "一")
+        return 1;
+    else if (s == "二")
+        return 2;
+    else if (s == "三")
+        return 3;
+    else if (s == "四")
+        return 4;
+    else if (s == "五")
+        return 5;
+    else if (s == "六")
+        return 6;
+    return -1;
+}
+
 void ShowWindow::initView()
 {
     this->setMinimumSize(100, 200);
@@ -37,13 +83,10 @@ void ShowWindow::initView()
     week_combo->addItems(sl);
 
     // 添加每星期
-    time_list->addItem("周日");
-    time_list->addItem("周一");
-    time_list->addItem("周二");
-    time_list->addItem("周三");
-    time_list->addItem("周四");
-    time_list->addItem("周五");
-    time_list->addItem("周六");
+    for (int i = 0; i < 7; i++)
+    {
+        time_list->addItem("周"+weekDayTrans(i));
+    }
 
     // 链接信号槽
     connect(week_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWeekChanged(int)));
@@ -160,20 +203,7 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
 
     // 判断第几周
     QString week = re.capturedTexts().at(1);
-    if (week == "日")
-        cls.day = 0;
-    else if (week == "一")
-        cls.day = 1;
-    else if (week == "二")
-        cls.day = 2;
-    else if (week == "三")
-        cls.day = 3;
-    else if (week == "四")
-        cls.day = 4;
-    else if (week == "五")
-        cls.day = 5;
-    else if (week == "六")
-        cls.day = 6;
+    cls.day = weekDayTrans(week);
 
     // 判断课程范围，可能是 1,2  也可能是 3-5
     QStringList courses = ress.at(2).split(QRegExp("[,-]"));
@@ -240,13 +270,7 @@ void ShowWindow::refreshInfomation()
     }
 
     numb_edit->clear();
-    QString xingqi = "日";
-    if (current_day == 1) xingqi = "一";
-    else if (current_day == 2) xingqi = "二";
-    else if (current_day == 3) xingqi = "三";
-    else if (current_day == 4) xingqi = "四";
-    else if (current_day == 5) xingqi = "五";
-    else if (current_day == 6) xingqi = "六";
+    QString xingqi = weekDayTrans(current_day);
     numb_edit->append("第"+QString::number(current_week)+"周 星期"+xingqi+"：\n");
     numb_edit->append("上午第 4节：" + QString::number(morning4) + " 人\n");
     numb_edit->append("上午第 5节：" + QString::number(morning5) + " 人\n");
