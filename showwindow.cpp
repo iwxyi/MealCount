@@ -57,6 +57,55 @@ int ShowWindow::weekDayTrans(QString s)
     return -1;
 }
 
+/**
+ * 获取某一天的情况
+ * @param week 周数
+ * @param day  周几
+ * @return     一天餐点的人数
+ */
+ShowWindow::DayNum ShowWindow::getDayInfo(int week, int day)
+{
+    DayNum dn;
+
+    // 遍历每一个课程
+    for (int i = 0; i < clss.size(); i++)
+    {
+        Cls cls = clss.at(i);
+
+        // 判断周的范围
+        if (cls.start_week > week || cls.end_week < week)
+            continue;
+
+        // 判断单双周
+        if (cls.dual && week & 1)
+            continue;
+        if (cls.single && !(week & 1))
+            continue;
+
+        // 判断周几
+        if (cls.day != day)
+            continue;
+
+        // 判断课程时间：上午4
+        if (cls.end_course == 4)
+            dn.m4 += cls.member;
+        // 判断课程时间：上午5
+        if (cls.end_course == 5)
+            dn.m5 += cls.member;
+        // 判断课程时间：下午9
+        if (cls.end_course == 9)
+            dn.a9 += cls.member;
+        // 判断课程时间：晚上11
+        if (cls.end_course == 11)
+            dn.n11 += cls.member;
+        // 判断课程时间：晚上12
+        if (cls.end_course == 12)
+            dn.n12 += cls.member;
+    }
+
+    return dn;
+}
+
 void ShowWindow::initView()
 {
     this->setMinimumSize(100, 200);
@@ -66,7 +115,7 @@ void ShowWindow::initView()
     week_combo = new QComboBox(this);
     time_list = new QListWidget(this);
     numb_edit = new QTextEdit(this);
-    copy_btn = new QPushButton("复制", this);
+    copy_btn = new QPushButton("复制所有", this);
     vlayout->addWidget(week_combo);
     vlayout->addWidget(time_list);
     main_layout->addLayout(vlayout);
@@ -226,57 +275,16 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
  */
 void ShowWindow::refreshInfomation()
 {
-    int morning4 = 0;
-    int morning5 = 0;
-    int afternoon9 = 0;
-    int night11 = 0;
-    int night12 = 0;
-//qDebug() << "clss.size = " << clss.size();
-    // 遍历每一个课程
-    for (int i = 0; i < clss.size(); i++)
-    {
-        Cls cls = clss.at(i);
-//        qDebug() << "cls:" << cls.toString();
-//qDebug() << "0";
-        // 判断周的范围
-        if (cls.start_week > current_week || cls.end_week < current_week)
-            continue;
-//qDebug() << "1";
-        // 判断单双周
-        if (cls.dual && current_week & 1)
-            continue;
-        if (cls.single && !(current_week & 1))
-            continue;
-//qDebug() << "2";
-        // 判断周几
-        if (cls.day != current_day)
-            continue;
-//qDebug() << "3";
-        // 判断课程时间：上午4
-        if (cls.end_course == 4)
-            morning4 += cls.member;
-        // 判断课程时间：上午5
-        if (cls.end_course == 5)
-            morning5 += cls.member;
-        // 判断课程时间：下午9
-        if (cls.end_course == 9)
-            afternoon9 += cls.member;
-        // 判断课程时间：晚上11
-        if (cls.end_course == 11)
-            night11 += cls.member;
-        // 判断课程时间：晚上12
-        if (cls.end_course == 12)
-            night12 += cls.member;
-    }
+    DayNum dn = getDayInfo(current_week, current_day);
 
     numb_edit->clear();
     QString xingqi = weekDayTrans(current_day);
     numb_edit->append("第"+QString::number(current_week)+"周 星期"+xingqi+"：\n");
-    numb_edit->append("上午第 4节：" + QString::number(morning4) + " 人\n");
-    numb_edit->append("上午第 5节：" + QString::number(morning5) + " 人\n");
-    numb_edit->append("下午第 9节：" + QString::number(afternoon9) + " 人\n");
-    numb_edit->append("晚上第11节：" + QString::number(night11) + " 人\n");
-    numb_edit->append("晚上第12节：" + QString::number(night12) + " 人");
+    numb_edit->append("上午第 4节：" + QString::number(dn.m4) + " 人\n");
+    numb_edit->append("上午第 5节：" + QString::number(dn.m5) + " 人\n");
+    numb_edit->append("下午第 9节：" + QString::number(dn.a9) + " 人\n");
+    numb_edit->append("晚上第11节：" + QString::number(dn.n11) + " 人\n");
+    numb_edit->append("晚上第12节：" + QString::number(dn.n12) + " 人");
 }
 
 /**

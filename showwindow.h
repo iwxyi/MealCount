@@ -44,6 +44,16 @@ struct Cls {
 
 struct DayNum {
     int m4, m5, a9, n11, n12;
+
+    DayNum()
+    {
+        m4 = m5 = a9 = n11 = n12 = 0;
+    }
+
+    QString toString()
+    {
+        return QString("%1\t%2\t%3\t%4\t%5").arg(m4).arg(m5).arg(a9).arg(n11).arg(n12);
+    }
 };
 
 public:
@@ -52,6 +62,7 @@ public:
 protected:
     QString weekDayTrans(int x);
     int weekDayTrans(QString);
+    DayNum getDayInfo(int week, int day);
 
 private:
     void initView();
