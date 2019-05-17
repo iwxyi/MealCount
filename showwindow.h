@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDialog>
+#include <QApplication>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QListWidget>
@@ -11,6 +12,9 @@
 #include <QList>
 #include <QRegExp>
 #include <QDebug>
+#include <QPushButton>
+#include <QMessageBox>
+#include <QClipboard>
 
 class ShowWindow : public QDialog
 {
@@ -53,12 +57,14 @@ signals:
 public slots:
     void slotWeekChanged(int x);
     void slotDayChanged(int x);
+    void slotCopyAll();
 
 private:
     QStringList times, numbs;
     QComboBox* week_combo;
     QListWidget* time_list;
     QTextEdit* numb_edit;
+    QPushButton* copy_btn;
 
     QList<Cls> clss;
     int current_week;

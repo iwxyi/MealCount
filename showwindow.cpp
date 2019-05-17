@@ -20,10 +20,12 @@ void ShowWindow::initView()
     week_combo = new QComboBox(this);
     time_list = new QListWidget(this);
     numb_edit = new QTextEdit(this);
+    copy_btn = new QPushButton("复制", this);
     vlayout->addWidget(week_combo);
     vlayout->addWidget(time_list);
     main_layout->addLayout(vlayout);
     main_layout->addWidget(numb_edit);
+    main_layout->addWidget(copy_btn);
     this->setLayout(main_layout);
 
     // 添加周数
@@ -46,6 +48,7 @@ void ShowWindow::initView()
     // 链接信号槽
     connect(week_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWeekChanged(int)));
     connect(time_list, SIGNAL(currentRowChanged(int)), this, SLOT(slotDayChanged(int)));
+    connect(copy_btn, SIGNAL(clicked()), this, SLOT(slotCopyAll()));
 
     // 开始统计分离的课程
     analyze(times, numbs, clss);
@@ -270,4 +273,22 @@ void ShowWindow::slotDayChanged(int x)
 {
     current_day = x;
     refreshInfomation();
+}
+
+/**
+ * 复制所有的内容到表格
+ */
+void ShowWindow::slotCopyAll()
+{
+    QString ex_str = "周数\t星期\t上午4\t上午5\t下午9\t晚上11\t晚上12\n";
+    for (int week = 1; week < 30; week++)
+    {
+        for (int day = 0; day < 7; day++)
+        {
+
+        }
+    }
+    QClipboard *board = QApplication::clipboard();
+    board->setText(ex_str);
+    QMessageBox::information(this, "操作完成", "已复制到剪贴板，请打开 Excel 粘贴");
 }
