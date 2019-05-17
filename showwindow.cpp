@@ -2,14 +2,14 @@
 
 ShowWindow::ShowWindow(QWidget *parent, QString c1, QString c2) : QDialog(parent)
 {
-    times = c1.split("\n");
-    numbs = c2.split("\n");
-
     Monday_first = true;
     current_week = 1;
     current_day = 1;
 
     initView();
+
+    // 开始统计分离的课程
+    analyze(c1.split("\n"), c2.split("\n"), clss);
 }
 
 void ShowWindow::initView()
@@ -47,9 +47,6 @@ void ShowWindow::initView()
     connect(week_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWeekChanged(int)));
     connect(time_list, SIGNAL(currentRowChanged(int)), this, SLOT(slotDayChanged(int)));
     connect(copy_btn, SIGNAL(clicked()), this, SLOT(slotCopyAll()));
-
-    // 开始统计分离的课程
-    analyze(times, numbs, clss);
 }
 
 /**

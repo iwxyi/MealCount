@@ -79,14 +79,13 @@ public slots:
     void slotCopyAll();
 
 private:
-    QStringList times, numbs;
     QComboBox* week_combo;
     QListWidget* time_list;
     QTextEdit* numb_edit;
     QPushButton* copy_btn;
 
-    QList<Cls> clss;
-    bool Monday_first;
+    QList<Cls> clss;   // 课程时间人数，从字符串数组转换为数组对象
+    bool Monday_first; // 一周从星期一开始还是星期日开始
     int current_week;
     int current_day;
 };
