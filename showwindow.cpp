@@ -144,11 +144,13 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
     QRegExp re("周(.)第?([\\d,-]+)节\\{第?(\\d+)-(\\d+)周\\}");
     if (!re.exactMatch(time))
     {
-        qDebug() << "无法正则匹配时间：" << time;
         // 特判：周二第3-4节{17周}
         re.setPattern("周(.)第?([\\d,-]+)节\\{第?(\\d+)周\\}");
         if (!re.exactMatch(time))
+        {
+            qDebug() << "无法正则匹配时间：" << time;
             return cls;
+        }
     }
     QStringList ress = re.capturedTexts();
 //    qDebug() << "capturedTexts:" << ress;
