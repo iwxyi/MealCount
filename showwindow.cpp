@@ -157,14 +157,15 @@ int ShowWindow::weekDayTrans(QString s)
 void ShowWindow::analyze(QStringList times, QStringList numbs, QList<Cls> &clss)
 {
     clss.clear();
+    // 遍历数组中的每一行
     for (int i = 0; i < times.size(); i++)
     {
-        QList<Cls> temps = clssFromString(times.at(i), numbs.at(i));
-        if (temps.size() > 0)
+        QList<Cls> ress = clssFromString(times.at(i), numbs.at(i));
+        if (ress.size() > 0)
         {
-            for (int j = 0; j < temps.size(); j++)
+            for (int j = 0; j < ress.size(); j++)
             {
-                clss.append(temps.at(j));
+                clss.append(ress.at(j));
             }
         }
     }
@@ -179,6 +180,7 @@ void ShowWindow::analyze(QStringList times, QStringList numbs, QList<Cls> &clss)
 QList<ShowWindow::Cls> ShowWindow::clssFromString(QString time, QString numb)
 {
     QList<Cls> clss;
+    // 遍历数组中每一行的每个时间段（分号分隔）
     //if (time.indexOf(";") > -1) // 多个时间段
     //{
     QStringList times = time.split(";");
@@ -237,7 +239,7 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
         time = time.replace("(单)", "");
     }
 
-    // 判断格式、使用正则表达式捕获
+    // 判断格式、使用正则表达式捕获对应位置
     QRegExp re("周(.)第?([\\d,-]+)节\\{第?(\\d+)-(\\d+)周\\}");
     if (!re.exactMatch(time))
     {
@@ -250,7 +252,7 @@ ShowWindow::Cls ShowWindow::clsFromString(QString time, QString numb)
         }
     }
     QStringList ress = re.capturedTexts();
-//    qDebug() << "capturedTexts:" << ress;
+//    qDebug() << "capturedTexts:" << ress; // 调试输出匹配结果
 
     // 判断第几周
     QString week = re.capturedTexts().at(1);
